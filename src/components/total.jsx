@@ -1,7 +1,8 @@
 import React, { useState, useRef, useEffect } from 'react';
 import { Canvas } from "@react-three/fiber";
-import { Environment, OrbitControls } from "@react-three/drei";
+import { Environment, OrbitControls , Bounds, ContactShadows} from "@react-three/drei";
 import Avatar from "./Avatar";    // Ensure your Avatar.jsx export is correct
+// import { OrbitControls, Environment, Bounds, ContactShadows } from "@react-three/drei";
 
 const VoiceChatLoop = () => {
   const [listening, setListening] = useState(false);
@@ -92,7 +93,7 @@ const VoiceChatLoop = () => {
           await new Promise(res => setTimeout(res, 200));
         }
 
-        if (listening) startListening();
+        startListening();
       } catch (err) {
         console.error("Error in voice loop:", err);
         setListening(false);
@@ -154,7 +155,7 @@ const VoiceChatLoop = () => {
       'https://api.elevenlabs.io/v1/text-to-speech/JBFqnCBsd6RMkjVDRZzb/stream', {
       method: 'POST',
       headers: {
-        // 'xi-api-key': process.env.REACT_APP_ELEVENLABS_API_KEY,
+        'xi-api-key': process.env.REACT_APP_ELEVENLABS_API_KEY,
         'Content-Type': 'application/json'
       },
       body: JSON.stringify({
@@ -229,13 +230,18 @@ const VoiceChatLoop = () => {
           <div className="sidebar-section">
             <h3>📹 Live Feed</h3>
             <div className="video-container" style={{ width: "100%", height: "270px" }}>
-              <Canvas shadows camera={{ position: [0, 0, 8], fov: 42 }}>
+              <Canvas shadows camera={{ position: [0, 1.6, 4], fov: 45 }}>
                 <color attach="background" args={["#ececec"]} />
-                <ambientLight />
-                <OrbitControls />
+                <ambientLight intensity={0.3} />
+                <directionalLight position={[2, 5, 2]} castShadow intensity={1.2} />
+                <OrbitControls target={[0, 1.6, 0]} enablePan={false} />
+                <ContactShadows position={[0, -1.2, 0]} opacity={0.4} scale={10} blur={1.5} />
                 <Environment preset="sunset" />
+                
+                {/* Just load the model directly now */}
                 <Avatar audioUrl={botAudioUrl} animationCue={avatarAnim} />
               </Canvas>
+
             </div>
           </div>
           
