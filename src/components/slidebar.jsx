@@ -1,6 +1,7 @@
 import React from 'react';
+import './slidebar.css';
 
-export default function Sidebar({ open, onClose, onSelect, selected }) {
+export default function Sidebar({ open, onClose, onSelect, selected, onLogout }) {
   return (
     <div className={`sidebar ${open ? "open" : ""}`}>
       <button className="close-btn" onClick={onClose}>×</button>
@@ -10,6 +11,7 @@ export default function Sidebar({ open, onClose, onSelect, selected }) {
         <button onClick={() => onSelect('paidproducts')} className={selected === 'paidproducts' ? 'active' : ''}>Paid Products</button>
         {/* Add more as needed */}
       </div>
+      <button className="sidebar-logout-btn" onClick={onLogout}>Logout</button>
     </div>
   );
 }
