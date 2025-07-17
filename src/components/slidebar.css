@@ -1,0 +1,68 @@
+.sidebar {
+  position: fixed;
+  top: 0;
+  left: -260px;
+  width: 240px;
+  height: 100vh;
+  background: #222;
+  color: #fff;
+  box-shadow: 2px 0 12px rgba(0,0,0,0.15);
+  transition: left 0.3s cubic-bezier(.4,0,.2,1);
+  z-index: 1000;
+  display: flex;
+  flex-direction: column;
+  padding-top: 2rem;
+}
+
+.sidebar.open {
+  left: 0;
+}
+
+.close-btn {
+  background: none;
+  border: none;
+  color: #fff;
+  font-size: 2rem;
+  position: absolute;
+  top: 1rem;
+  right: 1rem;
+  cursor: pointer;
+}
+
+.sidebar-links {
+  display: flex;
+  flex-direction: column;
+  margin-top: 2rem;
+}
+
+.sidebar-links button {
+  background: none;
+  border: none;
+  color: #fff;
+  padding: 1rem 2rem;
+  text-align: left;
+  font-size: 1.1rem;
+  cursor: pointer;
+  transition: background 0.2s;
+}
+
+.sidebar-links button.active,
+.sidebar-links button:hover {
+  background: #444;
+}
+
+.sidebar-logout-btn {
+  background: #e74c3c;
+  color: #fff;
+  border: none;
+  padding: 0.75rem 2rem;
+  border-radius: 6px;
+  font-size: 1rem;
+  cursor: pointer;
+  margin: 2rem 1rem 1rem 1rem;
+  align-self: center;
+  transition: background 0.2s;
+}
+.sidebar-logout-btn:hover {
+  background: #c0392b;
+} 
