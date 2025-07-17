@@ -1,0 +1,317 @@
+.paid-products-container {
+  min-height: 100vh;
+  background: linear-gradient(135deg, #101024 0%, #181a2b 50%, #16213e 100%);
+  color: #eaf0ff;
+  font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+  padding-bottom: 24px;
+}
+
+.paid-header {
+  background: rgba(26, 26, 46, 0.97);
+  border-bottom: 1px solid rgba(102, 126, 234, 0.1);
+  padding: 38px 48px 16px 48px;
+  text-align: left;
+}
+
+.paid-header h1 {
+  font-size: 2.1rem;
+  font-weight: 700;
+  background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
+  -webkit-background-clip: text;
+  -webkit-text-fill-color: transparent;
+  background-clip: text;
+  margin-bottom: 8px;
+  letter-spacing: 0.5px;
+}
+
+.paid-header p {
+  margin-top: 7px;
+  color: #bdbddb;
+  font-size: 1.13rem;
+}
+
+.paid-main {
+  padding: 32px 48px;
+  display: flex;
+  flex-direction: column;
+  gap: 43px;
+}
+
+.paid-section {
+  background: rgba(30, 32, 60, 0.98);
+  padding: 27px 28px 20px 28px;
+  border-radius: 14px;
+  box-shadow: 0 3px 24px 0 #22316c36;
+  border: 1.3px solid #222245;
+  margin-bottom: 12px;
+}
+
+.paid-section > h2 {
+  margin-bottom: 20px;
+  color: #a887ff;
+  font-size: 1.16em;
+  font-weight: 700;
+  text-shadow: 0 2px 13px #39187844;
+}
+
+/* Professional cards */
+.pro-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 24px;
+}
+
+.pro-card {
+  display: flex;
+  background: linear-gradient(118deg, #191b2b 80%, #48427044 100%);
+  border: 1.2px solid #667eea33;
+  box-shadow: 0 3px 18px 0 #2d217b33;
+  border-radius: 12px;
+  overflow: hidden;
+  min-width: 270px;
+  max-width: 320px;
+  padding: 13px 14px 14px 13px;
+  align-items: flex-start;
+  gap: 14px;
+}
+
+.pro-card img {
+  width: 65px;
+  height: 65px;
+  border-radius: 50%;
+  object-fit: cover;
+  margin-right: 13px;
+  border: 2.5px solid #a887ff33;
+}
+
+.pro-name {
+  font-weight: 700;
+  font-size: 1.16em;
+  color: #eaf0ff;
+  margin-bottom: 2px;
+}
+.pro-specialty {
+  color: #a887ff;
+  font-size: 0.96em;
+  margin-bottom: 4px;
+}
+.pro-langs, .pro-rating, .pro-profile {
+  color: #bdbddb;
+  font-size: 0.92em;
+  margin-bottom: 2px;
+}
+.pro-profile {
+  margin-bottom: 6px;
+}
+.pro-actions {
+  margin-top: 7px;
+  display: flex;
+  gap: 8px;
+}
+.pro-actions button {
+  background: linear-gradient(120deg, #667eea 0%, #764ba2 100%);
+  border: none;
+  color: #fff;
+  border-radius: 5px;
+  padding: 6px 14px;
+  cursor: pointer;
+  font-weight: 500;
+  font-size: 1em;
+  transition: background .16s;
+}
+.pro-actions button:disabled {
+  background: #181a2b;
+  opacity: 0.64;
+  color: #aaa;
+  cursor: not-allowed;
+}
+
+.report-box {
+  background: #181a2b;
+  border-radius: 12px;
+  padding: 17px 16px 14px 16px;
+  box-shadow: 0 1px 9px #33336618;
+  color: #d8dcff;
+  margin-bottom: 7px;
+}
+.report-actions {
+  margin-top: 13px;
+  display: flex;
+  gap: 11px;
+}
+.report-actions button {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  padding: 7px 15px;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.97em;
+}
+.report-email-form {
+  margin-top: 12px;
+  display: flex;
+  gap: 11px;
+}
+.report-email-form input {
+  flex: 1;
+  padding: 8px 13px;
+  border-radius: 5px;
+  border: 1.2px solid #232657;
+  background: #232657;
+  color: #eaf0ff;
+  font-size: 1em;
+}
+.report-email-form button {
+  background: #59c173;
+  color: #fff;
+  border: none;
+  border-radius: 5px;
+  font-weight: bold;
+  padding: 8px 14px;
+  font-size: 0.98em;
+}
+
+.pad-bottom {
+  margin-bottom: 11px;
+}
+.assessment {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 18px 39px;
+  align-items: flex-end;
+}
+.assessment > div {
+  flex: 1 1 210px;
+  display: flex;
+  flex-direction: column;
+  gap: 7px;
+}
+.assessment label {
+  color: #f9e3fd;
+  font-size: 1em;
+}
+.assessment select {
+  padding: 7px 9px;
+  border-radius: 6px;
+  border: 1.2px solid #8f9be6;
+  background: #181a2b;
+  color: #fff;
+  font-size: 0.97em;
+  margin-top: 2px;
+}
+.assessment-btn {
+  margin-top: 13px;
+  background: linear-gradient(90deg, #009ffd, #2a2a72);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  padding: 9px 20px;
+  font-size: 1.03em;
+  font-weight: 600;
+  cursor: pointer;
+}
+
+.assessment-result {
+  padding: 20px 17px 10px 17px;
+  border-radius: 11px;
+  background: #23194c;
+  color: #e3e4f7;
+}
+.assessment-result .assess-level {
+  font-weight: 600;
+  text-transform: uppercase;
+  margin-left: 5px;
+  padding: 2px 8px;
+  border-radius: 9px;
+  box-shadow: 0 2px 8px #a887ff18;
+}
+.level-severe { background: #f6635e; color: #fff; }
+.level-moderate { background: #fca652; color: #fff; }
+.level-mild { background: #4388f7; color: #fff; }
+.level-low { background: #49e6b7; color: #222; }
+.assessment-result button {
+  margin-top: 15px;
+  background: linear-gradient(90deg, #43cea2, #185a9d);
+  color: #fff;
+  border: none;
+  border-radius: 6px;
+  font-weight: bold;
+  padding: 8px 16px;
+  font-size: 1.01em;
+  cursor: pointer;
+}
+
+.resource-list {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 19px;
+}
+.resource-card {
+  background: #232657;
+  border-radius: 9px;
+  padding: 15px 20px;
+  display: flex;
+  flex-direction: row;
+  align-items: center;
+  min-width: 220px;
+  max-width: 320px;
+  justify-content: space-between;
+  box-shadow: 0 3px 10px #1a185e3f;
+  border: 1px solid #323369;
+}
+.resource-title {
+  color: #eee;
+  font-weight: 600;
+  font-size: 1em;
+}
+.resource-type {
+  color: #a887ff;
+  font-size: .95em;
+}
+.resource-link {
+  background: linear-gradient(90deg, #667eea 0%, #764ba2 100%);
+  color: #fff;
+  border-radius: 5px;
+  padding: 8px 14px;
+  font-weight: 500;
+  text-decoration: none;
+  margin-left: 6px;
+  transition: background .13s;
+}
+.resource-link:hover {
+  background: #a887ff;
+  color: #232657;
+}
+
+.priority-notice {
+  background: #3b1652;
+  border: 1px solid #a887ff55;
+  border-radius: 8px;
+  color: #ffd6fc;
+  padding: 16px;
+  box-shadow: 0 3px 12px #a887ff18;
+  font-size: 1.08em;
+  font-weight: 500;
+  margin-top: 12px;
+}
+
+@media (max-width: 900px) {
+  .paid-main {
+    padding: 18px 5vw;
+  }
+  .pro-list, .resource-list {
+    flex-direction: column;
+    gap: 21px;
+    align-items: stretch;
+  }
+}
+@media (max-width: 540px) {
+  .paid-header, .paid-main {
+    padding-left: 5vw;
+    padding-right: 5vw;
+  }
+}
+
+/* End of PaidProducts.css */
