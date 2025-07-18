@@ -154,10 +154,4 @@ function AvatarModel({
 useGLTF.preload("/models/646d9dcdc8a5f5bddbfac913.glb");
 
 // Wrap avatar in <Bounds> for auto-framing
-export default function AvatarWithBounds(props) {
-  return (
-    <Bounds fit clip observe margin={1.2}>
-      <AvatarModel {...props} />
-    </Bounds>
-  );
-}
+export default AvatarModel;

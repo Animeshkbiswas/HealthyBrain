@@ -2,6 +2,8 @@ import React, { useState, useRef, useEffect } from 'react';
 import { Canvas } from "@react-three/fiber";
 import { Environment, OrbitControls , Bounds, ContactShadows} from "@react-three/drei";
 import Avatar from "./Avatar";    // Ensure your Avatar.jsx export is correct
+import { account } from "../appwrite";
+import jsPDF from "jspdf";
 // import { OrbitControls, Environment, Bounds, ContactShadows } from "@react-three/drei";
 
 const VoiceChatLoop = () => {
@@ -11,6 +13,8 @@ const VoiceChatLoop = () => {
   const [scores, setScores] = useState({});
   const [loading, setLoading] = useState(false);
   const [showEmotionModal, setShowEmotionModal] = useState(false);
+  const [userId, setUserId] = useState(null);
+  const [reportLoading, setReportLoading] = useState(false);
 
   // Avatar audio & animation
   const [botAudioUrl, setBotAudioUrl] = useState(null);
@@ -39,78 +43,92 @@ const VoiceChatLoop = () => {
     setVideoFrameUrl("");
   };
 
-  const startListening = async () => {
-    const stream = await navigator.mediaDevices.getUserMedia({ audio: true });
-    const mediaRecorder = new MediaRecorder(stream);
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
 
-    mediaRecorder.ondataavailable = event => {
-      audioChunksRef.current.push(event.data);
-    };
+  const startListening = () => {
+    if (!SpeechRecognition) {
+      alert('Speech Recognition is not supported in this browser.');
+      setListening(false);
+      return;
+    }
+    setLoading(true);
+    const recognition = new SpeechRecognition();
+    recognition.lang = 'en-US';
+    recognition.interimResults = false;
+    recognition.maxAlternatives = 1;
 
-    mediaRecorder.onstop = async () => {
-      setLoading(true);
-      const audioBlob = new Blob(audioChunksRef.current, { type: 'audio/wav' });
-      audioChunksRef.current = [];
-
-      const formData = new FormData();
-      formData.append("audio", audioBlob, "recording.wav");
-
-      try {
-        const sttResponse = await fetch("http://127.0.0.1:5000/stt", {
-          method: "POST",
-          body: formData,
+    recognition.onresult = async (event) => {
+      const userText = event.results[0][0].transcript;
+      setChat(prev => [...prev, { sender: 'You', text: userText }]);
+      // Save user message to backend
+      if (userId && userText) {
+        fetch('http://127.0.0.1:5000/save_message', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
+          body: JSON.stringify({ user_id: userId, message: userText })
         });
-        const sttData = await sttResponse.json();
-        const userText = sttData.text;
-        setChat(prev => [...prev, { sender: 'You', text: userText }]);
-        const words = userText.split(" ");
-        for (let i = 0; i < words.length; i++) {
-          const partial = words.slice(0, i + 1).join(" ");
-          setChat(prev => [...prev.slice(0, -1), { sender: 'You', text: partial }]);
-          await new Promise(res => setTimeout(res, 150));
-        }
-
-        const llamaResponse = await fetch("http://127.0.0.1:5000/llama", {
-          method: "POST",
-          headers: { "Content-Type": "application/json" },
+      }
+      const words = userText.split(' ');
+      for (let i = 0; i < words.length; i++) {
+        const partial = words.slice(0, i + 1).join(' ');
+        setChat(prev => [...prev.slice(0, -1), { sender: 'You', text: partial }]);
+        await new Promise(res => setTimeout(res, 150));
+      }
+      try {
+        const llamaResponse = await fetch('http://127.0.0.1:5000/llama', {
+          method: 'POST',
+          headers: { 'Content-Type': 'application/json' },
           body: JSON.stringify({ prompt: userText }),
         });
         const llamaData = await llamaResponse.json();
         const botText = llamaData.response;
-        const word = botText.split(" ");
-
+        const word = botText.split(' ');
         const audioBlob = await speakResponse(botText);
         if (botAudioUrl) {
           URL.revokeObjectURL(botAudioUrl);
         }
         const botAudioNewUrl = URL.createObjectURL(audioBlob);
         setBotAudioUrl(botAudioNewUrl);
-        setAvatarAnim("talk");
+        setAvatarAnim('talk');
         setChat(prev => [...prev, { sender: 'Bot', text: botText }]);
+        // Save bot message to backend
+        if (userId && botText) {
+          fetch('http://127.0.0.1:5000/save_message', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/json' },
+            body: JSON.stringify({ user_id: userId, message: botText })
+          });
+        }
         for (let i = 0; i < word.length; i++) {
-          const partial_ = word.slice(0, i + 1).join(" ");
+          const partial_ = word.slice(0, i + 1).join(' ');
           setChat(prev => [...prev.slice(0, -1), { sender: 'Bot', text: partial_ }]);
           await new Promise(res => setTimeout(res, 200));
         }
-
-        startListening();
       } catch (err) {
-        console.error("Error in voice loop:", err);
+        console.error('Error in voice loop:', err);
         setListening(false);
       }
       setLoading(false);
+      setListening(false); // End listening after one phrase
     };
 
-    mediaRecorderRef.current = mediaRecorder;
-    mediaRecorder.start();
-    setTimeout(() => mediaRecorder.stop(), 5000);
+    recognition.onerror = (event) => {
+      setLoading(false);
+      setListening(false);
+      alert('Speech recognition error: ' + event.error);
+    };
+
+    recognition.onend = () => {
+      setLoading(false);
+      setListening(false);
+    };
+
+    recognition.start();
   };
 
   const stopListening = () => {
     setListening(false);
-    if (mediaRecorderRef.current?.state === "recording") {
-      mediaRecorderRef.current.stop();
-    }
+    // No-op: recognition stops automatically after result/onend
   };
 
   const toggleListening = async () => {
@@ -134,7 +152,9 @@ const VoiceChatLoop = () => {
       setEmotion(true);
       await fetch("http://127.0.0.1:5000/start", { method: "POST" });
       startEmotionStream();
-      startVideoStream();
+      setTimeout(() => {
+        startVideoStream();
+      }, 500); // 500ms delay to let backend initialize
     }
   };
 
@@ -168,7 +188,20 @@ const VoiceChatLoop = () => {
     return audioBlob;
   };
 
+  // Fetch userId and chat history on mount
   useEffect(() => {
+    account.get().then(user => {
+      setUserId(user.$id);
+      fetch(`http://127.0.0.1:5000/get_messages?user_id=${user.$id}`)
+        .then(res => res.json())
+        .then(data => {
+          if (data.messages) {
+            setChat(data.messages.map(m => ({ sender: 'You', text: m.message, timestamp: m.timestamp })));
+          }
+        });
+    }).catch(() => {
+      // Not logged in
+    });
     return () => {
       if (eventSourceRef.current) {
         eventSourceRef.current.close();
@@ -204,6 +237,29 @@ const VoiceChatLoop = () => {
     );
   };
 
+  // Generate and download report as PDF
+  const handleGenerateReport = async () => {
+    if (!userId) return;
+    setReportLoading(true);
+    const res = await fetch('http://127.0.0.1:5000/generate_report', {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify({ user_id: userId })
+    });
+    const data = await res.json();
+    setReportLoading(false);
+    if (data.status === 'success') {
+      const doc = new jsPDF();
+      doc.setFontSize(16);
+      doc.text('Medical Report', 10, 20);
+      doc.setFontSize(12);
+      doc.text(data.report, 10, 35, { maxWidth: 180 });
+      doc.save('medical_report.pdf');
+    } else {
+      alert('Failed to generate report: ' + (data.message || 'Unknown error'));
+    }
+  };
+
   return (
     <div className="voice-chat-container">
       <header className="chat-header">
@@ -222,6 +278,9 @@ const VoiceChatLoop = () => {
             {emotion ? '😐' : '😊'}
           </button>
         </div>
+        <button onClick={handleGenerateReport} disabled={reportLoading || !userId} style={{marginLeft: '1rem', padding: '0.5rem 1rem'}}>
+          {reportLoading ? 'Generating PDF...' : 'Generate Report PDF'}
+        </button>
       </header>
 
       <div className="main-content">
@@ -230,17 +289,31 @@ const VoiceChatLoop = () => {
           <div className="sidebar-section">
             <h3>📹 Live Feed</h3>
             <div className="video-container" style={{ width: "100%", height: "270px" }}>
-              <Canvas shadows camera={{ position: [0, 1.6, 4], fov: 45 }}>
-                <color attach="background" args={["#ececec"]} />
-                <ambientLight intensity={0.3} />
+              <Canvas
+                shadows
+                camera={{ position: [0, 0, 10], fov: 8 }} // Closer to face, narrower view
+              >
+                <color attach="background" args={["#ffffff"]} /> {/* White background */}
+                <ambientLight intensity={0.5} />
                 <directionalLight position={[2, 5, 2]} castShadow intensity={1.2} />
-                <OrbitControls target={[0, 1.6, 0]} enablePan={false} />
-                <ContactShadows position={[0, -1.2, 0]} opacity={0.4} scale={10} blur={1.5} />
+                <OrbitControls
+                  target={[0, 1.6, 0]}
+                  enablePan={false}
+                  enableRotate={false}
+                  enableZoom={false}
+                />
+                <ContactShadows position={[0, -1.2, 0]} opacity={0.3} scale={10} blur={1.5} />
                 <Environment preset="sunset" />
-                
-                {/* Just load the model directly now */}
-                <Avatar audioUrl={botAudioUrl} animationCue={avatarAnim} />
+                <Avatar
+                  audioUrl={botAudioUrl}
+                  animationCue={avatarAnim}
+                  position={[0, -0.85, 8]}
+                  scale={[0.7,0.7,0.7]}
+                  // rotation={[0, Math.PI, 0]}
+                />
               </Canvas>
+
+
 
             </div>
           </div>
@@ -350,36 +423,6 @@ const VoiceChatLoop = () => {
                   </div>
                 </div>
               ))}
-              {Object.keys(scores).length > 5 && (
-                <button 
-                  className="view-all-btn"
-                  onClick={() => setShowEmotionModal(true)}
-                >
-                  View All Emotions
-                </button>
-              )}
-            </div>
-          </div>
-
-          <div className="sidebar-section">
-            <h3>📊 Chat Stats</h3>
-            <div className="stats-display">
-              <div className="stat-item">
-                <span className="stat-label">Messages</span>
-                <span className="stat-value">{chat.length}</span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Status</span>
-                <span className={`stat-value ${listening ? 'active' : 'inactive'}`}>
-                  {listening ? 'Listening' : 'Idle'}
-                </span>
-              </div>
-              <div className="stat-item">
-                <span className="stat-label">Emotion</span>
-                <span className={`stat-value ${emotion ? 'active' : 'inactive'}`}>
-                  {emotion ? 'Active' : 'Off'}
-                </span>
-              </div>
             </div>
           </div>
         </aside>

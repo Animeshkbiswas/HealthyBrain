@@ -1,11 +1,14 @@
 import './App.css';
 import './VoiceChatLoop.css';
 import './Marketplace.css';
-import './PaidProducts.css'
+import './PaidProducts.css';
+// import './Blogs.module.css';
 import VoiceChatLoop from './components/total.jsx';
 import Marketplace from './components/Marketplace.jsx';
 import PaidProducts from './components/PaidProducts.jsx';
 import Sidebar from './components/slidebar'; 
+import Blog from './components/Blogs.jsx';
+import Quiz from './components/Quiz.jsx';
 
 import React, { useEffect, useState } from "react";
 import { BrowserRouter as Router, Route, Routes, Navigate } from "react-router-dom";
@@ -38,6 +41,10 @@ function App() {
     MainComponent = <Marketplace />;
   } else if (selected === 'paidproducts') {
     MainComponent = <PaidProducts />;
+  } else if (selected === 'blogs') {
+    MainComponent = <Blog />;
+  } else if (selected === 'quiz') {
+    MainComponent = <Quiz />;
   }
 
   return (
